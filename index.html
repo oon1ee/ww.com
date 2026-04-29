@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>SYSTEM ERROR</title>
+
+<style>
+body {
+    background: black;
+    color: #00ff00;
+    font-family: monospace;
+    overflow: hidden;
+}
+
+.error {
+    position: absolute;
+    font-size: 12px;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    padding: 6px;
+    width: 220px;
+}
+
+.flash {
+    animation: flash 0.2s infinite;
+}
+
+@keyframes flash {
+    50% { filter: brightness(3); }
+}
+
+.start-btn, .save-btn {
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 15px;
+    cursor: pointer;
+}
+
+.start-btn {
+    top: 40%;
+    background: red;
+    color: #00ff00;
+}
+
+.save-btn {
+    top: 50%;
+    background: black;
+    color: red;
+    border: 2px solid red;
+    display: none;
+    z-index: 99999999;
+}
+
+.love {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: pink;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#loadingScreen {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: black;
+    color: red;
+    font-size: 30px;
+    justify-content: center;
+    align-items: center;
+    z-index: 9998;
+}
+</style>
+</head>
+
+<body>
+
+<div class="start-btn" id="start">KLIK AKUU</div>
+<div class="save-btn" id="save">⚠️ SELAMATKAN SISTEM ⚠️</div>
+
+<div id="loadingScreen">
+    <p id="loadingText">RECOVERING SYSTEM... 0%</p>
+</div>
+
+<div class="love" id="love">
+    <h1>I LOVE YOU AIKOO ❤️</h1>
+</div>
+
+<audio id="beepSound" loop>
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b7c1b.mp3">
+</audio>
+
+<script>
+let errorInterval;
+let vibrateInterval;
+
+const start = document.getElementById("start");
+const save = document.getElementById("save");
+const love = document.getElementById("love");
+
+function createError() {
+    const box = document.createElement("div");
+    box.className = "error";
+
+    box.style.top = Math.random()*window.innerHeight+"px";
+    box.style.left = Math.random()*window.innerWidth+"px";
+
+    box.innerHTML = `
+<pre>
+[ SYSTEM LOG ]
+> initializing...
+> loading modules...
+> ERROR 0x${Math.floor(Math.random()*9999)}
+> critical failure
+</pre>
+    `;
+
+    document.body.appendChild(box);
+}
+
+function fakeLoading(callback){
+    const screen = document.getElementById("loadingScreen");
+    const text = document.getElementById("loadingText");
+
+    screen.style.display="flex";
+
+    let p=0;
+    let i=setInterval(()=>{
+        p++;
+        text.innerText="RECOVERING SYSTEM... "+p+"%";
+
+        if(p==99){
+            clearInterval(i);
+            setTimeout(()=>{
+                screen.style.display="none";
+                callback();
+            },1500);
+        }
+    },30);
+}
+
+function loveRain(){
+    setInterval(()=>{
+        const h=document.createElement("div");
+        h.innerText="❤️";
+        h.style.position="fixed";
+        h.style.left=Math.random()*window.innerWidth+"px";
+        h.style.top="0px";
+        document.body.appendChild(h);
+
+        let y=0;
+        let d=setInterval(()=>{
+            y+=5;
+            h.style.top=y+"px";
+            if(y>window.innerHeight){
+                clearInterval(d);
+                h.remove();
+            }
+        },30);
+    },200);
+}
+
+start.onclick = () => {
+    start.style.display = "none";
+    document.body.classList.add("flash");
+
+    const sound = document.getElementById("beepSound");
+    sound.currentTime = 0;
+    sound.play();
+
+    errorInterval = setInterval(createError, 50);
+
+    if (navigator.vibrate) {
+        vibrateInterval = setInterval(() => {
+            navigator.vibrate([100,50,100]);
+        }, 300);
+    }
+
+    setTimeout(()=>{
+        save.style.display="block";
+    },1500);
+};
+
+save.onclick=()=>{
+    clearInterval(errorInterval);
+    clearInterval(vibrateInterval);
+
+    document.body.classList.remove("flash");
+    document.querySelectorAll(".error").forEach(e=>e.remove());
+
+    save.style.display="none";
+
+    fakeLoading(()=>{
+        love.style.display="flex";
+        loveRain();
+    });
+};
+</script>
+
+</body>
+  </html>
